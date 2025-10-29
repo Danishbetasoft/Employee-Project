@@ -1,4 +1,5 @@
-<template>  <v-app>
+<template>
+  <v-app>
     <v-main class="bg-grey-lighten-5">
       <v-container fluid class="py-10 px-6 mx-auto" style="max-width: 1200px">
         <v-row class="mb-6 align-center">
@@ -8,6 +9,7 @@
               Manage all personnel data efficiently
             </p>
           </v-col>
+
           <v-col cols="12" md="6" class="d-flex justify-end align-center gap-3">
             <v-btn
               color="error"
@@ -18,6 +20,7 @@
               <v-icon start>mdi-logout</v-icon>
               Logout
             </v-btn>
+
             <v-btn
               color="primary"
               class="text-none font-weight-medium elevation-3"
@@ -36,7 +39,6 @@
               v-model="search"
               label="Search Employees"
               prepend-inner-icon="mdi-magnify"
-            
               variant="solo-filled"
               density="compact"
               hide-details
@@ -49,20 +51,19 @@
             item-key="id"
             :search="search"
           >
-          <template #item.actions="{ item }">
-  <div class="action-buttons">
-    <v-btn icon color="primary" size="small" @click.stop="editEmployee(item)">
-      <v-icon size="18">mdi-pencil-outline</v-icon>
-    </v-btn>
-    <v-btn icon color="secondary" size="small" @click.stop="openBgInfo(item)">
-      <v-icon size="18">mdi-file-document-outline</v-icon>
-    </v-btn>
-    <v-btn icon color="red-darken-2" size="small" @click.stop="deleteEmployee(item)">
-      <v-icon size="18">mdi-delete-outline</v-icon>
-    </v-btn>
-  </div>
-</template>
-
+            <template #item.actions="{ item }">
+              <div class="action-buttons">
+                <v-btn icon color="primary" size="small" @click.stop="editEmployee(item)">
+                  <v-icon size="18">mdi-pencil-outline</v-icon>
+                </v-btn>
+                <v-btn icon color="secondary" size="small" @click.stop="openBgInfo(item)">
+                  <v-icon size="18">mdi-file-document-outline</v-icon>
+                </v-btn>
+                <v-btn icon color="red-darken-2" size="small" @click.stop="deleteEmployee(item)">
+                  <v-icon size="18">mdi-delete-outline</v-icon>
+                </v-btn>
+              </div>
+            </template>
 
             <template #item.username="{ item }">
               <span
@@ -82,15 +83,13 @@
                 {{ isEditing ? `Editing: ${selectedEmployee.username}` : 'Add New Employee' }}
               </v-toolbar-title>
               <v-spacer />
-              <v-btn icon dark @click="modalVisible = false"><v-icon>mdi-close</v-icon></v-btn>
+              <v-btn icon dark @click="modalVisible = false">
+                <v-icon>mdi-close</v-icon>
+              </v-btn>
             </v-toolbar>
 
             <v-card-text class="pa-6">
-              <Form
-                :validation-schema="schema"
-                :initial-values="selectedEmployee"
-                @submit="saveInfo"
-              >
+              <Form :validation-schema="schema" :initial-values="selectedEmployee" @submit="saveInfo">
                 <v-row dense>
                   <v-col cols="12" sm="6">
                     <Field name="username" v-slot="{ field, errors }">
@@ -105,6 +104,7 @@
                       />
                     </Field>
                   </v-col>
+
                   <v-col cols="12" sm="6">
                     <Field name="email" v-slot="{ field, errors }">
                       <v-text-field
@@ -123,12 +123,10 @@
 
                 <v-card-actions class="px-0 pt-4">
                   <v-spacer />
-                  <v-btn variant="text" @click="modalVisible = false" class="text-none"
-                    >Cancel</v-btn
-                  >
-                  <v-btn color="primary" class="text-none elevation-2" type="submit"
-                    >Save Changes</v-btn
-                  >
+                  <v-btn variant="text" @click="modalVisible = false" class="text-none">Cancel</v-btn>
+                  <v-btn color="primary" class="text-none elevation-2" type="submit">
+                    Save Changes
+                  </v-btn>
                 </v-card-actions>
               </Form>
             </v-card-text>
@@ -147,6 +145,7 @@
 
             <v-card-text class="pa-6" style="max-height: 70vh; overflow-y: auto">
               <v-form>
+
                 <v-sheet class="pa-4 mb-4" elevation="1" rounded>
                   <h3 class="text-subtitle-1 font-weight-bold text-primary mb-3">
                     Employee Identification
@@ -243,6 +242,7 @@
                   </v-row>
                 </v-sheet>
 
+                <!-- Financial Info -->
                 <v-sheet class="pa-4 mb-4" elevation="1" rounded>
                   <h3 class="text-subtitle-1 font-weight-bold text-primary mb-3">
                     Financial Information
@@ -267,6 +267,7 @@
                   </v-row>
                 </v-sheet>
 
+                <!-- Narrative Details -->
                 <v-sheet class="pa-4 mb-4" elevation="1" rounded>
                   <h3 class="text-subtitle-1 font-weight-bold text-primary mb-3">
                     Narrative Details
@@ -317,9 +318,9 @@
 
                 <v-card-actions class="px-0 pt-4">
                   <v-spacer />
-                  <v-btn variant="text" @click="bgModalVisible = false" class="text-none"
-                    >Cancel</v-btn
-                  >
+                  <v-btn variant="text" @click="bgModalVisible = false" class="text-none">
+                    Cancel
+                  </v-btn>
                   <v-btn
                     color="primary"
                     class="text-none elevation-2"
@@ -339,38 +340,18 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
-import { employeeStore } from '@/stores/employee'
-import { useAuthStore } from '@/stores/auth'
+import { ref, reactive, onMounted } from 'vue'
 import { Form, Field } from 'vee-validate'
 import * as yup from 'yup'
+import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
+import { apiClient } from '@/plugins/api'
 
-const store = employeeStore()
 const auth = useAuthStore()
 const router = useRouter()
 
-if (!store.employees.length) {
-  fetch('https://dummyjson.com/users')
-    .then((res) => res.json())
-    .then((data) => {
-      store.employees = data.users.map((u) => ({
-        id: u.id,
-        username: u.username,
-        email: u.email,
-        bgInfo: {},
-      }))
-    })
-}
-
-const headers = [
-  { title: 'Username', key: 'username', align: 'start' },
-  { title: 'Email', key: 'email', align: 'start' },
-  { title: 'Actions', key: 'actions', sortable: false, align: 'center', width: '150px' },
-]
-
+const employeesForTable = ref([])
 const search = ref('')
-const employeesForTable = computed(() => store.employees)
 const modalVisible = ref(false)
 const bgModalVisible = ref(false)
 const selectedEmployee = reactive({ id: null, username: '', email: '', bgInfo: {} })
@@ -381,6 +362,15 @@ const endMenu = ref(false)
 const schema = yup.object({
   username: yup.string().required('Username is required'),
   email: yup.string().email('Must be a valid email').required('Email is required'),
+})
+
+onMounted(async () => {
+  try {
+    const res = await apiClient.get('/employees')
+    employeesForTable.value = res.data
+  } catch (error) {
+    console.error('Error fetching employees:', error)
+  }
 })
 
 function formatDate(dateValue) {
@@ -396,59 +386,79 @@ function editEmployee(employee) {
 }
 
 function addEmployee() {
-  Object.assign(selectedEmployee, {
-    id: null,
-    username: '',
-    email: '',
-    bgInfo: { startDate: null, endDate: null },
-  })
+  Object.assign(selectedEmployee, { id: null, username: '', email: '', bgInfo: {} })
   isEditing.value = false
   modalVisible.value = true
 }
 
-function saveInfo(values) {
-  if (!isEditing.value) {
-    store.addUser({ ...values, id: Date.now(), bgInfo: { startDate: null, endDate: null } })
-  } else {
-    store.updateUser(selectedEmployee.id, values)
+async function saveInfo(values) {
+  try {
+    if (!isEditing.value) {
+      const res = await apiClient.post('/employees', values)
+      employeesForTable.value.push(res.data)
+    } else {
+      await apiClient.put(`/employees/${selectedEmployee.id}`, values)
+      const index = employeesForTable.value.findIndex(e => e.id === selectedEmployee.id)
+      if (index !== -1) employeesForTable.value[index] = { ...selectedEmployee, ...values }
+    }
+    modalVisible.value = false
+  } catch (error) {
+    console.error('Error saving employee info:', error)
   }
-  modalVisible.value = false
 }
 
-function deleteEmployee(employee) {
-  store.removeUser(employee.id)
+async function deleteEmployee(employee) {
+  try {
+    await apiClient.delete(`/employees/${employee.id}`)
+    employeesForTable.value = employeesForTable.value.filter(e => e.id !== employee.id)
+  } catch (error) {
+    console.error('Error deleting employee:', error)
+  }
 }
 
 function openBgInfo(employee) {
   if (!employee.bgInfo) employee.bgInfo = {}
-  if (!employee.bgInfo.startDate) employee.bgInfo.startDate = null
-  if (!employee.bgInfo.endDate) employee.bgInfo.endDate = null
   Object.assign(selectedEmployee, employee)
   bgModalVisible.value = true
 }
 
-function saveBgInfo(values) {
-  selectedEmployee.bgInfo = { ...values }
-  store.updateUser(selectedEmployee.id, { bgInfo: selectedEmployee.bgInfo })
-  bgModalVisible.value = false
+async function saveBgInfo(values) {
+  try {
+    await apiClient.put(`/employees/${selectedEmployee.id}/bgInfo`, {
+      bgInfo: values,
+    })
+    const index = employeesForTable.value.findIndex(e => e.id === selectedEmployee.id)
+    if (index !== -1) employeesForTable.value[index].bgInfo = values
+    bgModalVisible.value = false
+  } catch (error) {
+    console.error('Error saving background info:', error)
+  }
 }
 
-function handleLogout() {
-  auth.logout()
-  router.push('/login')
+async function handleLogout() {
+  try {
+    await apiClient.post('/auth/logout')
+  } catch (error) {
+    console.error('Error during logout:', error)
+  } finally {
+    auth.logout()
+    router.push('/login')
+  }
 }
 
 function copyLink() {
   const link = `${window.location.origin}/edit/${selectedEmployee.id}`
   navigator.clipboard
     .writeText(link)
-    .then(() => {
-      alert('Link copied to clipboard!')
-    })
-    .catch(() => {
-      alert('Failed to copy the link.')
-    })
+    .then(() => alert('Link copied to clipboard!'))
+    .catch(() => alert('Failed to copy the link.'))
 }
+
+const headers = [
+  { title: 'Username', key: 'username', align: 'start' },
+  { title: 'Email', key: 'email', align: 'start' },
+  { title: 'Actions', key: 'actions', sortable: false, align: 'center', width: '150px' },
+]
 </script>
 
 <style scoped>
@@ -458,13 +468,11 @@ function copyLink() {
   align-items: center;
   gap: 10px;
 }
-
 .v-btn.v-btn--icon {
   width: 32px;
   height: 32px;
   padding: 4px;
 }
-
 .v-btn .v-icon {
   font-size: 18px;
 }

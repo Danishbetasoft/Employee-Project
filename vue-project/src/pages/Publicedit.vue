@@ -5,9 +5,7 @@
         <h1>Update Professional Background</h1>
         <v-form ref="bgForm" v-model="formValid">
           <v-sheet class="pa-4 mb-4" elevation="1" rounded>
-            <h3 class="text-subtitle-1 font-weight-bold text-primary mb-3">
-              Employee Identification
-            </h3>
+            <h3 class="text-subtitle-1 font-weight-bold text-primary mb-3">Employee Identification</h3>
             <v-row dense>
               <v-col cols="12" sm="6">
                 <v-text-field
@@ -24,7 +22,6 @@
                   label="Employee ID"
                   :readonly="!!adminPrefill.id"
                   prepend-inner-icon="mdi-identifier"
-               
                   variant="outlined"
                 />
               </v-col>
@@ -32,9 +29,7 @@
           </v-sheet>
 
           <v-sheet class="pa-4 mb-4" elevation="1" rounded>
-            <h3 class="text-subtitle-1 font-weight-bold text-primary mb-3">
-              Previous Employment Details
-            </h3>
+            <h3 class="text-subtitle-1 font-weight-bold text-primary mb-3">Previous Employment Details</h3>
             <v-row dense>
               <v-col cols="12" sm="6">
                 <v-text-field
@@ -46,12 +41,7 @@
                 />
               </v-col>
               <v-col cols="12" sm="6">
-                <v-menu
-                  v-model="startMenu"
-                  :close-on-content-click="false"
-                  transition="scale-transition"
-                  offset-y
-                >
+                <v-menu v-model="startMenu" :close-on-content-click="false" transition="scale-transition" offset-y>
                   <template #activator="{ props }">
                     <v-text-field
                       v-bind="props"
@@ -62,20 +52,11 @@
                       variant="outlined"
                     />
                   </template>
-                  <v-date-picker
-                    v-model="bgInfo.startDate"
-                    @update:model-value="startMenu = false"
-                    color="primary"
-                  />
+                  <v-date-picker v-model="bgInfo.startDate" @update:model-value="startMenu = false" color="primary" />
                 </v-menu>
               </v-col>
               <v-col cols="12" sm="6">
-                <v-menu
-                  v-model="endMenu"
-                  :close-on-content-click="false"
-                  transition="scale-transition"
-                  offset-y
-                >
+                <v-menu v-model="endMenu" :close-on-content-click="false" transition="scale-transition" offset-y>
                   <template #activator="{ props }">
                     <v-text-field
                       v-bind="props"
@@ -86,11 +67,7 @@
                       variant="outlined"
                     />
                   </template>
-                  <v-date-picker
-                    v-model="bgInfo.endDate"
-                    @update:model-value="endMenu = false"
-                    color="primary"
-                  />
+                  <v-date-picker v-model="bgInfo.endDate" @update:model-value="endMenu = false" color="primary" />
                 </v-menu>
               </v-col>
               <v-col cols="12" sm="6">
@@ -106,9 +83,7 @@
           </v-sheet>
 
           <v-sheet class="pa-4 mb-4" elevation="1" rounded>
-            <h3 class="text-subtitle-1 font-weight-bold text-primary mb-3">
-              Financial Information
-            </h3>
+            <h3 class="text-subtitle-1 font-weight-bold text-primary mb-3">Financial Information</h3>
             <v-row dense>
               <v-col cols="12" sm="6">
                 <v-text-field
@@ -133,30 +108,15 @@
             <h3 class="text-subtitle-1 font-weight-bold text-primary mb-3">Narrative Details</h3>
             <v-row dense>
               <v-col cols="12">
-                <v-textarea
-                  v-model="bgInfo.responsibilities"
-                  label="Key Responsibilities"
-                  variant="outlined"
-                  rows="3"
-                />
+                <v-textarea v-model="bgInfo.responsibilities" label="Key Responsibilities" variant="outlined" rows="3" />
               </v-col>
               <v-col cols="12">
-                <v-textarea
-                  v-model="bgInfo.reasonLeaving"
-                  label="Reason for Leaving"
-                  variant="outlined"
-                  rows="3"
-                />
+                <v-textarea v-model="bgInfo.reasonLeaving" label="Reason for Leaving" variant="outlined" rows="3" />
               </v-col>
               <v-col cols="12">
-                <v-textarea
-                  v-model="bgInfo.conduct"
-                  label="Conduct & Performance"
-                  variant="outlined"
-                  rows="3"
-                />
+                <v-textarea v-model="bgInfo.conduct" label="Conduct & Performance" variant="outlined" rows="3" />
               </v-col>
-              <v-col cols="12" sm="6">
+              <v-col cols="12" sm="6">  
                 <v-text-field
                   v-model="bgInfo.reference"
                   label="Reference Contact"
@@ -186,45 +146,72 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import { employeeStore } from '@/stores/employee'
+import { ref, reactive, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import { apiClient } from '@/plugins/api';
 
-const route = useRoute()
-const store = employeeStore()
+const route = useRoute();
+const bgInfo = reactive({
+  name: '',
+  id: '',
+  prevCompany: '',
+  startDate: null,
+  endDate: null,
+  designation: '',
+  salary: '',
+  increment: '',
+  responsibilities: '',
+  reasonLeaving: '',
+  conduct: '',
+  reference: '',
+  additionalRemarks: '',
+});
 
-const bgInfo = reactive({})
-const adminPrefill = reactive({})
-const startMenu = ref(false)
-const endMenu = ref(false)
-const formValid = ref(false)
+const adminPrefill = reactive({});
+const startMenu = ref(false);
+const endMenu = ref(false);
+const formValid = ref(false);
 
 function formatDate(dateValue) {
-  if (!dateValue) return ''
-  const date = dateValue instanceof Date ? dateValue : new Date(dateValue)
-  return date.toISOString().substring(0, 10)
+  if (!dateValue) return '';
+  const date = dateValue instanceof Date ? dateValue : new Date(dateValue);
+  return date.toISOString().substring(0, 10);
 }
 
-onMounted(() => {
-  const id = parseInt(route.params.id)
-  const employee = store.getUser(id)
+onMounted(async () => {
+  const id = parseInt(route.params.id);
+  try {
+    const res = await apiClient.get(`/employees/${id}`);
+    const employee = res.data;
 
-  if (employee) {
-    for (const key in employee.bgInfo) {
-      bgInfo[key] = employee.bgInfo[key] || ''
-      if (employee.bgInfo[key]) adminPrefill[key] = true
+    if (employee.bgInfo) {
+      Object.assign(bgInfo, employee.bgInfo);
+      for (const key in employee.bgInfo) {
+        if (employee.bgInfo[key]) adminPrefill[key] = true;
+      }
     }
+    if (employee.username) bgInfo.name = employee.username;
+    if (employee.id) bgInfo.id = employee.id;
+  } catch (error) {
+    console.error('Error fetching employee:', error);
+    alert('Failed to load employee data.');
   }
-})
+});
 
-function saveBgInfo() {
-  const id = parseInt(route.params.id)
-  store.updateUser(id, { bgInfo: { ...bgInfo } })
-  alert('Background info saved successfully!')
+async function saveBgInfo() {
+  const id = parseInt(route.params.id);
+  try {
+    await apiClient.put(`/employees/${id}/bginfo`, { bgInfo });
+    alert('Background info saved successfully!');
+  } catch (error) {
+    console.error('Error saving background info:', error);
+    alert('Failed to save data. Please try again.');
+  }
 }
 </script>
+
 <style scoped>
 .v-input__prepend-inner .v-icon {
-  font-size: 18px !important; 
+  font-size: 18px !important;
 }
 </style>

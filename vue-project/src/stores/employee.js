@@ -26,7 +26,7 @@ export const employeeStore = defineStore('employee', {
       } catch (error) {
         console.error('Failed to fetch employees:', error)
       }
-    },
+    },  
 
     addUser(employee) {
       this.employees.push({ ...employee, id: Date.now() })
