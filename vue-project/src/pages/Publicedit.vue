@@ -149,6 +149,7 @@
 import { ref, reactive, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { apiClient } from '@/plugins/api';
+import router from '@/router';
 
 const route = useRoute();
 const bgInfo = reactive({
@@ -203,6 +204,7 @@ async function saveBgInfo() {
   try {
     await apiClient.put(`/employees/${id}/bginfo`, { bgInfo });
     alert('Background info saved successfully!');
+    router.push('/thankyou');
   } catch (error) {
     console.error('Error saving background info:', error);
     alert('Failed to save data. Please try again.');

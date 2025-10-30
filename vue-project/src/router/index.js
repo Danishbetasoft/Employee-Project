@@ -2,10 +2,12 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import Login from '@/components/Login.vue'
 import Dashboard from '@/pages/Dashboard.vue'
+import ThankYou from '@/pages/ThankYou.vue'
 
 const routes = [
   { path: '/login', name: 'Login', component: Login },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
+  { path: '/thankyou', name: 'Thank', component: ThankYou },
   {
     path: '/edit/:id',
     name: 'PublicEdit',
