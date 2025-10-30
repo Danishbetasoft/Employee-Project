@@ -181,7 +181,7 @@ function formatDate(dateValue) {
 onMounted(async () => {
   const id = parseInt(route.params.id);
   try {
-    const res = await apiClient.get(`/employees/${id}`);
+    const res = await apiClient.get(`/employees/public/${id}`);
     const employee = res.data;
 
     if (employee.bgInfo) {

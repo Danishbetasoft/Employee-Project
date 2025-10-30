@@ -5,7 +5,19 @@ import { promisify } from 'util';
 
 const router = express.Router();
 const queryPromise = promisify(pool.query).bind(pool);
-
+router.get('/public/:id', async (req, res) => {
+    const { id } = req.params;
+  
+    pool.query('SELECT id, username, email, bgInfo FROM employees WHERE id=?', [id], (err, rows) => {
+      if (err) return res.status(500).json({ message: 'Server error' });
+      if (!rows.length) return res.status(404).json({ message: 'Employee not found' });
+  
+      const employee = rows[0];
+      employee.bgInfo = employee.bgInfo ? JSON.parse(employee.bgInfo) : {};
+      res.json(employee);
+    });
+  });
+  
 router.get('/', authenticateToken, (req, res) => {
     const { skip = 0, take = 10 } = req.query;
     const offset = parseInt(skip) || 0;
@@ -67,7 +79,7 @@ router.get('/', authenticateToken, (req, res) => {
 
                 return res.json({
                     data: employees,
-                    totalCount: finalTotalCount,
+                    totalCount: employees.length > 0 ? finalTotalCount : 0,
                 });
             });
         }

@@ -193,11 +193,70 @@
                     Save Professional Background
                   </v-btn>
                   <v-btn color="secondary" class="rounded-lg" @click="copyLink">Copy Link</v-btn>
+                  <v-btn color="success" class="rounded-lg" @click="openMailModal">Send Mail</v-btn>
+
                 </v-card-actions>
               </v-form>
             </v-card-text>
           </v-card>
         </v-dialog>
+        <v-dialog v-model="mailModalVisible" max-width="600" transition="dialog-bottom-transition">
+  <v-card class="rounded-xl">
+    <v-toolbar color="primary" flat class="rounded-t-xl">
+      <v-toolbar-title class="text-white text-h6 font-weight-regular">
+        Send Mail - {{ selectedEmployee.username || 'Employee' }}
+      </v-toolbar-title>
+      <v-spacer />
+      <v-btn icon dark @click="mailModalVisible = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-toolbar>
+
+    <v-card-text class="pa-6">
+      <v-form ref="mailForm" @submit.prevent="sendMail">
+        <v-text-field
+          v-model="mailFormData.to"
+          label="To (comma separated emails)"
+          variant="outlined"
+          prepend-inner-icon="mdi-email-multiple-outline"
+          required
+        />
+        <v-text-field
+          v-model="mailFormData.cc"
+          label="CC"
+          variant="outlined"
+          prepend-inner-icon="mdi-email-outline"
+        />
+        <v-text-field
+          v-model="mailFormData.bcc"
+          label="BCC"
+          variant="outlined"
+          prepend-inner-icon="mdi-email-outline"
+        />
+        <v-text-field
+          v-model="mailFormData.companyName"
+          label="Company Name"
+          variant="outlined"
+          prepend-inner-icon="mdi-office-building"
+          required
+        />
+        <v-textarea
+          v-model="mailFormData.message"
+          label="Message (optional)"
+          rows="3"
+          variant="outlined"
+          prepend-inner-icon="mdi-text"
+        />
+      </v-form>
+    </v-card-text>
+
+    <v-card-actions class="px-6 pb-4">
+      <v-spacer />
+      <v-btn variant="text" @click="mailModalVisible = false" class="text-none">Cancel</v-btn>
+      <v-btn color="primary" class="text-none elevation-2" @click="sendMail">Send</v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
 
         <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
           {{ snackbar.message }}
@@ -219,6 +278,16 @@ import DataSource from 'devextreme/data/data_source'
 import DxDataGrid, { DxColumn, DxPaging, DxPager, DxToolbar, DxItem, DxSearchPanel } from 'devextreme-vue/data-grid'
 import 'devextreme/dist/css/dx.fluent.blue.light.css'
 
+
+const mailModalVisible = ref(false)
+
+const mailFormData = reactive({
+  to: '',
+  cc: '',
+  bcc: '',
+  companyName: '',
+  message: ''
+})
 const auth = useAuthStore()
 const router = useRouter()
 const modalVisible = ref(false)
@@ -241,8 +310,13 @@ const store = new CustomStore({
     if (loadOptions.take !== undefined) params.take = loadOptions.take
     if (loadOptions.searchValue) params.search = loadOptions.searchValue
     if (loadOptions.filter) params.filter = JSON.stringify(loadOptions.filter)
+
     const res = await apiClient.get('/employees', { params })
-    return { data: res.data.data || res.data, totalCount: res.data.totalCount || res.data.total || 0 }
+    console.log('Loaded employees:', res.data)
+    return {
+      data: res.data.data || [],
+      totalCount: res.data.totalCount || 0
+    }
   },
 })
 
@@ -310,6 +384,40 @@ function copyLink() {
     .then(() => showSnackbar('Link copied to clipboard'))
     .catch(() => showSnackbar('Copy failed', 'error'))
 }
+
+
+
+function openMailModal() {
+  const link = `${window.location.origin}/edit/${selectedEmployee.id}`
+  mailFormData.message = `Hi,\n\nPlease review the employee background details using the link below:\n${link}\n\nBest regards,\nYour HR Team`
+  mailModalVisible.value = true
+}
+
+async function sendMail() {
+  try {
+    const link = `${window.location.origin}/edit/${selectedEmployee.id}`
+
+    const payload = {
+      user_id: selectedEmployee.id,
+      to: mailFormData.to.split(',').map(e => e.trim()).filter(Boolean),
+      cc: mailFormData.cc ? mailFormData.cc.split(',').map(e => e.trim()) : [],
+      bcc: mailFormData.bcc ? mailFormData.bcc.split(',').map(e => e.trim()) : [],
+      companyName: mailFormData.companyName,
+      message: mailFormData.message,
+      link
+    }
+
+    await apiClient.post('/mail/send', payload)
+
+    mailModalVisible.value = false
+    showSnackbar('Mail sent successfully')
+  } catch (error) {
+    console.error(error)
+    showSnackbar('Failed to send mail', 'error')
+  }
+}
+
+
 </script>
 
 <style scoped>
@@ -318,4 +426,4 @@ function copyLink() {
 .modern-toolbar { background: linear-gradient(90deg, #1976d2, #42a5f5); color: #fff !important; }
 .action-buttons { display: flex; justify-content: center; align-items: center; gap: 8px; }
 .v-btn.v-btn--icon { width: 36px; height: 36px; padding: 4px; }
-</style>
+</style> 
