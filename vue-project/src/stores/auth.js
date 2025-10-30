@@ -2,12 +2,18 @@ import { defineStore } from 'pinia'
 import { apiClient } from '@/plugins/api'
 
 export const useAuthStore = defineStore('auth', {
+  id: 'auth',
   state: () => ({
     user: null,
     token: null,
   }),
   getters: {
     isAuthenticated: (state) => !!state.token,
+  },
+  persist: {
+    key: 'auth-store',
+    paths: ['user', 'token'],
+    storage: localStorage,
   },
   actions: {
     async login(username, password) {
@@ -21,7 +27,7 @@ export const useAuthStore = defineStore('auth', {
         }
         return false
       } catch (err) {
-        console.error('Login failed:', err.response?.data?.message || err.message)
+        console.error(err)
         return false
       }
     },
@@ -30,5 +36,5 @@ export const useAuthStore = defineStore('auth', {
       this.token = null
     },
   },
- persist: true,
+
 })

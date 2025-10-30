@@ -70,12 +70,16 @@ const errorMsg = ref('')
 
 const router = useRouter()
 const authStore = useAuthStore()
+import { nextTick } from 'vue'
 
 onMounted(() => {
-  if (authStore.isAuthenticated) {
-    router.push('/dashboard')
-  }
+  nextTick(() => {
+    if (authStore.isAuthenticated) {
+      router.push('/dashboard')
+    }
+  })
 })
+
 
 async function submitLogin() {
   errorMsg.value = ''
