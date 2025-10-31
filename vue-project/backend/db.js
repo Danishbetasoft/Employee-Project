@@ -12,20 +12,18 @@ const pool = createPool({
 
 pool.getConnection((err, connection) => {
   if (err) {
-    console.error("❌ Error connecting to the database:", err);
+    console.error("Error connecting to the database:", err);
     return;
   }
 
-  console.log("✅ Database connected successfully.");
-
-  // Ensure database exists
+  console.log("Database connected successfully.");
   connection.query("CREATE DATABASE IF NOT EXISTS employee_db", (err) => {
     if (err) {
-      console.error("❌ Error creating database:", err);
+      console.error(" Error creating database:", err);
       return;
     }
 
-    console.log("✅ Database employee_db ensured.");
+    console.log(" Database employee_db ensured.");
 
     connection.query("USE employee_db", (err) => {
       if (err) {
@@ -33,7 +31,6 @@ pool.getConnection((err, connection) => {
         return;
       }
 
-      // Create employees table
       const createEmployees = `
         CREATE TABLE IF NOT EXISTS employees (
           id INT AUTO_INCREMENT PRIMARY KEY,
@@ -43,7 +40,6 @@ pool.getConnection((err, connection) => {
         );
       `;
 
-      // Create mail_records table
       const createMailRecords = `
         CREATE TABLE IF NOT EXISTS mail_records (
           id INT AUTO_INCREMENT PRIMARY KEY,
@@ -58,7 +54,6 @@ pool.getConnection((err, connection) => {
         );
       `;
 
-      // Create mail_events table
       const createMailEvents = `
         CREATE TABLE IF NOT EXISTS mail_events (
           id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -69,18 +64,17 @@ pool.getConnection((err, connection) => {
         );
       `;
 
-      // Execute table creation queries sequentially
       connection.query(createEmployees, (err) => {
-        if (err) console.error("❌ Error creating employees table:", err);
-        else console.log("✅ Employees table ensured.");
+        if (err) console.error(" Error creating employees table:", err);
+        else console.log("Employees table ensured.");
 
         connection.query(createMailRecords, (err) => {
-          if (err) console.error("❌ Error creating mail_records table:", err);
-          else console.log("✅ Mail_Records table ensured.");
+          if (err) console.error(" Error creating mail_records table:", err);
+          else console.log(" Mail_Records table ensured.");
 
           connection.query(createMailEvents, (err) => {
-            if (err) console.error("❌ Error creating mail_events table:", err);
-            else console.log("✅ Mail_Events table ensured.");
+            if (err) console.error(" Error creating mail_events table:", err);
+            else console.log(" Mail_Events table ensured.");
           });
         });
       });

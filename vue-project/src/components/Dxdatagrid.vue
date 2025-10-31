@@ -5,7 +5,7 @@
       :show-borders="true"
       :row-alternation-enabled="true"
       :column-auto-width="true"
-      :remote-operations="{ filtering: true, sorting: true, paging: true }"
+      :remote-operations="true"
     >
       <DxToolbar>
         <DxItem name="searchPanel" location="before" />
