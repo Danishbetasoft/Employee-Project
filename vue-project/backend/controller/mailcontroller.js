@@ -27,7 +27,7 @@ export const sendMail = async (req, res) => {
     }
 
     const trackingId = crypto.randomUUID();
-    const result = await query(
+    const result = await pool.query(
       `INSERT INTO mail_records (user_id, company_name, to_emails, cc_emails, bcc_emails, message, tracking_id)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [user_id, companyName, to.join(","), cc.join(","), bcc.join(","), message, trackingId]
@@ -39,7 +39,7 @@ export const sendMail = async (req, res) => {
     const trackOpenUrl = `${backendUrl}/track-open/${trackingId}`;
     const trackClickUrl = `${backendUrl}/track-click/${trackingId}`;
 
-    await query(
+    await pool.query(
       `INSERT INTO mail_events (user_id, form_id, event_type) VALUES (?, ?, 'sent')`,
       [user_id, formId]
     );

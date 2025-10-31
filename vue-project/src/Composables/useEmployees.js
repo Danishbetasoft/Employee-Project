@@ -106,10 +106,19 @@ export default function useEmployee(
   const dxGrid = computed(() => (dataGridRefName.value ? dataGridRefName.value.instance : null))
   const isMobile = computed(() => window.innerWidth <= 768)
 
-  function refreshTable(dataGridRef, changedOnly = false) {
-    if (!dataGridRef?.value?.instance) return
-    dataGridRef.value.instance.refresh(changedOnly)
-  }
+  const refreshTable = (dataGridRef, changedOnly = false) => {
+    if (!dataGridRef) {
+      console.error("DataGrid ref not provided.");
+      return;
+    }
+    const dataGrid = dataGridRef.value.instance;
+    if (!dataGrid) {
+      console.error("DataGrid instance not found.");
+      return;
+    }
+
+    dataGrid.refresh(changedOnly);
+  };
 
   return {
     employeeStore,

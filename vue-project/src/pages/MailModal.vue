@@ -28,13 +28,13 @@
             />
             <v-text-field
               v-model="mailFormData.cc"
-              label="CC"
+              label="CC (optional)"
               variant="outlined"
               prepend-inner-icon="mdi-email-outline"
             />
             <v-text-field
               v-model="mailFormData.bcc"
-              label="BCC"
+              label="BCC (optional)"
               variant="outlined"
               prepend-inner-icon="mdi-email-outline"
             />
@@ -58,13 +58,16 @@
         <v-card-actions class="px-6 pb-4">
           <v-spacer />
           <v-btn variant="text" @click="$emit('close')" class="text-none">Cancel</v-btn>
-          <v-btn color="primary" class="text-none elevation-2" @click="sendMail">Send</v-btn>
+          <v-btn color="primary" class="text-none elevation-2" @click="sendMail" :loading="loading">Send</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
   </template>
   
   <script setup>
+  import { reactive, ref } from 'vue'
+  import { apiemployee } from '@/plugins/employee'
+  
   const props = defineProps({ 
     employee: Object,
     visible: Boolean,
@@ -72,8 +75,38 @@
   })
   const emit = defineEmits(['close', 'send'])
   
-  function sendMail() {
-    console.log('Attempting to send mail with data:', props.mailFormData);
-    emit('close'); 
+  const loading = ref(false)
+  
+  async function sendMail() {
+    if (!props.mailFormData.to || !props.mailFormData.companyName) {
+      alert('Please fill in required fields: To and Company Name')
+      return
+    }
+  
+    loading.value = true
+  
+    try {
+      const payload = {
+        user_id: props.employee.id,
+        to: props.mailFormData.to.split(',').map(e => e.trim()).filter(e => e),
+        cc: props.mailFormData.cc ? props.mailFormData.cc.split(',').map(e => e.trim()).filter(e => e) : [],
+        bcc: props.mailFormData.bcc ? props.mailFormData.bcc.split(',').map(e => e.trim()).filter(e => e) : [],
+        companyName: props.mailFormData.companyName,
+        message: props.mailFormData.message || '',
+      }
+  
+      const response = await apiemployee.sendMail(payload)
+      console.log('Mail sent successfully:', response.data)
+      alert('Mail sent successfully!')
+      
+      emit('send', payload)
+      emit('close')
+    } catch (err) {
+      console.error('Error sending mail:', err)
+      alert('Failed to send mail. Check console for details.')
+    } finally {
+      loading.value = false
+    }
   }
   </script>
+  

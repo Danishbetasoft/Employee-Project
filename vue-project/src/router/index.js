@@ -5,6 +5,7 @@ import Dashboard from '@/pages/Dashboard.vue'
 import ThankYou from '@/pages/ThankYou.vue'
 
 const routes = [
+{path: '/', name: 'home', component: Login },
   { path: '/login', name: 'Login', component: Login },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/thankyou', name: 'Thank', component: ThankYou },
@@ -12,7 +13,7 @@ const routes = [
     path: '/edit/:id',
     name: 'PublicEdit',
     component: () => import('@/pages/Publicedit.vue'),
-    meta: { public: true }, // <-- mark as public
+    meta: { public: true },
   },
   { path: '/:pathMatch(.*)*', redirect: '/login' },
 ]
@@ -33,8 +34,15 @@ router.beforeEach(async (to) => {
   if (!authStore.isAuthenticated && to.name !== 'Login') {
     return { name: 'Login' }
   }
+ if (!authStore.isAuthenticated && to.name === 'home') {
+    return { name: 'Login' }
+  }
+  
 
   if (authStore.isAuthenticated && to.name === 'Login') {
+    return { name: 'Dashboard' }
+  }
+  if (authStore.isAuthenticated && to.name === 'home') {
     return { name: 'Dashboard' }
   }
 

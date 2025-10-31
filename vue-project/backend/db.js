@@ -27,7 +27,7 @@ pool.getConnection((err, connection) => {
 
     connection.query("USE employee_db", (err) => {
       if (err) {
-        console.error("❌ Error selecting database:", err);
+        console.error(" Error selecting database:", err);
         return;
       }
 
