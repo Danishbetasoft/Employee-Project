@@ -3,11 +3,10 @@ import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import pool from "../db.js";
 import crypto from "crypto";
-import { promisify } from "util";
+
 
 dotenv.config();
-
-const query = promisify(pool.query).bind(pool);
+pool.query(`use employee_db`)
 
 const transporter = nodemailer.createTransport({
   host: process.env.MAIL_HOST,
@@ -22,7 +21,7 @@ const transporter = nodemailer.createTransport({
 export const sendMail = async (req, res) => {
   try {
     const { user_id, to, cc = [], bcc = [], companyName, message } = req.body;
-    console.log("📩 Received Mail Body:", req.body);
+    console.log("Received Mail Body:", req.body);
     if (!user_id || !to?.length || !companyName) {
       return res.status(400).json({ success: false, error: "Missing user_id, to, or companyName" });
     }
