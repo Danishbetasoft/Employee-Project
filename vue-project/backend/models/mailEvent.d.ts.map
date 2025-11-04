@@ -1,0 +1,1 @@
+{"version":3,"file":"mailEvent.d.ts","sourceRoot":"","sources":["mailEvent.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,UAAU,EAAE,MAAM,kBAAkB,CAAC;AAE9C,qBACa,SAAS;IAEpB,EAAE,EAAE,MAAM,CAAC;IAIX,UAAU,EAAE,UAAU,CAAC;IAGvB,OAAO,EAAE,MAAM,CAAC;IAGhB,UAAU,EAAE,MAAM,CAAC;IAGnB,SAAS,EAAE,IAAI,CAAC;CACjB"}

@@ -1,13 +1,12 @@
-
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
-import pool from "../db.js";
+import { AppDataSource } from "../DB/dataSource.js";  
+
+import { MailEvent } from '../models/mailEvent.js';
+import { MailRecord } from '../models/mailRecords.js';
 import crypto from "crypto";
 
-
 dotenv.config();
-pool.query(`use employee_db`)
-
 const transporter = nodemailer.createTransport({
   host: process.env.MAIL_HOST,
   port: process.env.MAIL_PORT,
@@ -25,24 +24,30 @@ export const sendMail = async (req, res) => {
     if (!user_id || !to?.length || !companyName) {
       return res.status(400).json({ success: false, error: "Missing user_id, to, or companyName" });
     }
-
     const trackingId = crypto.randomUUID();
-    const result = await pool.query(
-      `INSERT INTO mail_records (user_id, company_name, to_emails, cc_emails, bcc_emails, message, tracking_id)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [user_id, companyName, to.join(","), cc.join(","), bcc.join(","), message, trackingId]
-    );
+    const mailRecord = new MailRecord();
+    mailRecord.user_id = user_id;
+    mailRecord.company_name = companyName;
+    mailRecord.to_emails = to.join(",");
+    mailRecord.cc_emails = cc.join(",");
+    mailRecord.bcc_emails = bcc.join(",");
+    mailRecord.message = message;
+    mailRecord.tracking_id = trackingId;
 
-    const formId = result.insertId;
+    const mailRecordRepository = AppDataSource.getRepository(MailRecord);
+    const savedMailRecord = await mailRecordRepository.save(mailRecord);
+
+    const mailEvent = new MailEvent();
+    mailEvent.user_id = user_id;
+    mailEvent.form_id = savedMailRecord.id;
+    mailEvent.event_type = 'sent';
+
+    const mailEventRepository = AppDataSource.getRepository(MailEvent);
+    await mailEventRepository.save(mailEvent);
 
     const backendUrl = process.env.BACKEND_URL || "http://localhost:3000";
     const trackOpenUrl = `${backendUrl}/track-open/${trackingId}`;
     const trackClickUrl = `${backendUrl}/track-click/${trackingId}`;
-
-    await pool.query(
-      `INSERT INTO mail_events (user_id, form_id, event_type) VALUES (?, ?, 'sent')`,
-      [user_id, formId]
-    );
 
     const html = `
       <div style="font-family:Arial,sans-serif;color:#333;">

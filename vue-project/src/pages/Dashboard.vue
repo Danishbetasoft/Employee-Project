@@ -91,9 +91,13 @@ function editEmployee(emp) {
 }
 
 function openProfessionalBackground(emp) {
-  Object.assign(selectedEmployee, emp)
+  Object.assign(selectedEmployee, {
+    ...emp,
+    bgInfo: emp.bgInfo || {}
+  })
   bgModalVisible.value = true
 }
+
 
 function closeBgModal() {
   bgModalVisible.value = false

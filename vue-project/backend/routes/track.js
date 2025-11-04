@@ -1,6 +1,7 @@
-
 import express from "express";
-import pool from "../db.js";
+import { AppDataSource } from "../DB/dataSource.js"; 
+import { MailRecord } from "../models/mailRecords.js";
+import { MailEvent } from "../models/mailEvent.js";
 
 const router = express.Router();
 
@@ -8,11 +9,26 @@ router.get("/track-open/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
-    await pool.query(
-      `INSERT INTO mail_events (form_id, event_type) 
-       SELECT id, 'opened' FROM mail_records WHERE tracking_id = ?`,
-      [id]
-    );
+    const mailRecordRepo = AppDataSource.getRepository(MailRecord);
+    const mailEventRepo = AppDataSource.getRepository(MailEvent);
+
+    const mailRecord = await mailRecordRepo.findOne({
+      where: { tracking_id: id },
+    });
+
+    if (!mailRecord) {
+      console.log("No mail record found for tracking ID:", id);
+      return res.status(404).send("Tracking ID not found");
+    }
+
+    const event = mailEventRepo.create({
+      user_id: mailRecord.user_id,
+      event_type: "opened",
+      mailRecord: mailRecord,  
+    });
+
+    await mailEventRepo.save(event);
+    console.log("Open event logged for:", id);
 
     const img = Buffer.from(
       "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=",
@@ -25,26 +41,39 @@ router.get("/track-open/:id", async (req, res) => {
     res.end(img);
   } catch (err) {
     console.error("Open tracking error:", err);
-    res.status(500).end();
+    res.status(500).send("Error logging open event");
   }
 });
+
+
+
+
 
 router.get("/track-click/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
-    await pool.query(
-      `INSERT INTO mail_events (form_id, event_type) 
-       SELECT id, 'clicked' FROM mail_records WHERE tracking_id = ?`,
-      [id]
-    );
+    const mailRecordRepo = AppDataSource.getRepository(MailRecord);
+    const mailEventRepo = AppDataSource.getRepository(MailEvent);
 
+    const mailRecord = await mailRecordRepo.findOne({ where: { tracking_id: id } });
+    if (!mailRecord) return res.status(404).send("Tracking ID not found");
+
+    const event = mailEventRepo.create({
+      user_id: mailRecord.user_id,
+     
+      event_type: "clicked",
+      mailRecord: mailRecord, 
+    });
+
+    await mailEventRepo.save(event);
+    console.log("Click event logged for:", id);
     const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
-    res.redirect(`${frontendUrl}/view/${id}`);
+    res.redirect(`${frontendUrl}/edit/${mailRecord.user_id}`);
   } catch (err) {
     console.error("Click tracking error:", err);
-    res.status(500).send("Error logging click");
+    res.status(500).send("Error logging click event");
   }
 });
 
-export default router;
+export default router;  

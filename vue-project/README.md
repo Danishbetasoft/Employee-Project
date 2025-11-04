@@ -42,3 +42,6 @@ npm run build
 ```sh
 npm run lint
 ```
+
+user->roles->user if success then employee and gets its credentials
+
