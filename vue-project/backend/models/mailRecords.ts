@@ -1,3 +1,4 @@
+
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { MailEvent } from "./mailEvent.js";
 
@@ -27,6 +28,6 @@ export class MailRecord {
   @Column()
   tracking_id: string = '';
 
-  @OneToMany(() => MailEvent, (mailEvent) => mailEvent.mailRecord)
+  @OneToMany(() => MailEvent, mailEvent => mailEvent.mailRecord)
   events: MailEvent[]
 }

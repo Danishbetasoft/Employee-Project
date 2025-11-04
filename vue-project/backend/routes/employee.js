@@ -1,11 +1,13 @@
-import express from 'express';
+import { Router } from 'express';
 import { authenticateToken } from './auth.js';
 import { Employee } from '../models/employee.js';
 import { AppDataSource } from '../DB/dataSource.js';
-
-const router = express.Router();
+import { Role } from '../models/role.js';
+import { User } from '../models/user.js';
+const router = Router();
 const employeeRepository = AppDataSource.getRepository(Employee);
-
+const roleRepository = AppDataSource.getRepository(Role);
+const userRepository = AppDataSource.getRepository(User);
 router.get('/public/:id', async (req, res) => {
   const { id } = req.params;
   try {
@@ -77,6 +79,7 @@ router.post('/', async (req, res) => {
       username,
       email,
       bgInfo: bgInfo || {},
+      status:'pending'
     });
     await employeeRepository.save(newEmployee);
     res.status(201).json(newEmployee);
@@ -88,13 +91,14 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
-  const { username, email, bgInfo } = req.body;
+  const { username, email, bgInfo,password } = req.body;
   try {
     const employee = await employeeRepository.findOneBy({ id: parseInt(id) });
     if (!employee) return res.status(404).json({ message: 'Employee not found' });
 
     employee.username = username || employee.username;
     employee.email = email || employee.email;
+    employee.password = password || employee.password;
 
     if (bgInfo && typeof bgInfo === 'object') {
       employee.bgInfo = { ...employee.bgInfo, ...bgInfo };
@@ -120,32 +124,39 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-router.put('/:id/bginfo', async (req, res) => {
+router.put('/:id/bgInfo', async (req, res) => {
   const { id } = req.params;
-  const { bgInfo } = req.body;
-  if (!bgInfo || typeof bgInfo !== 'object')
-    return res.status(400).json({ message: 'Invalid bgInfo payload' });
+  const { bgInfo, status } = req.body;
 
   try {
     const employee = await employeeRepository.findOneBy({ id: parseInt(id) });
     if (!employee) return res.status(404).json({ message: 'Employee not found' });
+    if (bgInfo && typeof bgInfo === 'object') {
+      const existingBgInfo = employee.bgInfo || {};
+      const updatedBgInfo = { ...existingBgInfo, ...bgInfo };
 
-    const existingBgInfo = employee.bgInfo || {};
-    const updatedBgInfo = { ...existingBgInfo, ...bgInfo };
+      if (updatedBgInfo.startDate)
+        updatedBgInfo.startDate = new Date(updatedBgInfo.startDate).toISOString().split('T')[0];
+      if (updatedBgInfo.endDate)
+        updatedBgInfo.endDate = new Date(updatedBgInfo.endDate).toISOString().split('T')[0];
 
-    if (updatedBgInfo.startDate)
-      updatedBgInfo.startDate = new Date(updatedBgInfo.startDate).toISOString().split('T')[0];
-    if (updatedBgInfo.endDate)
-      updatedBgInfo.endDate = new Date(updatedBgInfo.endDate).toISOString().split('T')[0];
+      employee.bgInfo = updatedBgInfo;
+    }
 
-    employee.bgInfo = updatedBgInfo;
+    if (status) {
+      employee.status = status;
+    }
+
     await employeeRepository.save(employee);
-
-    res.json(employee);
+    res.json(employee); 
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+
+
+
 
 export const employeeRouter = router;

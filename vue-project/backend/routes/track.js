@@ -1,9 +1,9 @@
-import express from "express";
+import { Router } from 'express';
 import { AppDataSource } from "../DB/dataSource.js"; 
 import { MailRecord } from "../models/mailRecords.js";
 import { MailEvent } from "../models/mailEvent.js";
 
-const router = express.Router();
+const router = Router();
 
 router.get("/track-open/:id", async (req, res) => {
   const { id } = req.params;
@@ -68,7 +68,7 @@ router.get("/track-click/:id", async (req, res) => {
 
     await mailEventRepo.save(event);
     console.log("Click event logged for:", id);
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    const frontendUrl = process.env.FRONTEND_URL;
     res.redirect(`${frontendUrl}/edit/${mailRecord.user_id}`);
   } catch (err) {
     console.error("Click tracking error:", err);

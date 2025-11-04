@@ -7,32 +7,37 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { MailRecord } from './mailRecords.js';
-let MailEvent = class MailEvent {
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { User } from './user.js';
+let Role = class Role {
     id;
-    event_type;
-    created_at;
-    mailRecord;
+    name;
+    created_at = new Date();
+    updated_at = new Date();
+    users;
 };
 __decorate([
     PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
-], MailEvent.prototype, "id", void 0);
+], Role.prototype, "id", void 0);
+__decorate([
+    Column({ unique: true }),
+    __metadata("design:type", String)
+], Role.prototype, "name", void 0);
 __decorate([
     Column(),
-    __metadata("design:type", String)
-], MailEvent.prototype, "event_type", void 0);
-__decorate([
-    Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' }),
     __metadata("design:type", Date)
-], MailEvent.prototype, "created_at", void 0);
+], Role.prototype, "created_at", void 0);
 __decorate([
-    ManyToOne(() => MailRecord, mailRecord => mailRecord.events),
-    __metadata("design:type", Object)
-], MailEvent.prototype, "mailRecord", void 0);
-MailEvent = __decorate([
+    Column(),
+    __metadata("design:type", Date)
+], Role.prototype, "updated_at", void 0);
+__decorate([
+    OneToMany(() => User, user => user.role),
+    __metadata("design:type", Array)
+], Role.prototype, "users", void 0);
+Role = __decorate([
     Entity()
-], MailEvent);
-export { MailEvent };
-//# sourceMappingURL=mailEvent.js.map
+], Role);
+export { Role };
+//# sourceMappingURL=role.js.map

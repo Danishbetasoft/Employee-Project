@@ -1,9 +1,9 @@
-import express from 'express';
+import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const router = express.Router();
+const router = Router();
 
 const ADMIN = { username: 'admin', password: 'admin123' };
 

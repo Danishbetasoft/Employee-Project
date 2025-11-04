@@ -8,7 +8,6 @@ export declare class MailRecord {
     bcc_emails: string;
     message: string;
     tracking_id: string;
-    createdAt: Date;
     events: MailEvent[];
 }
 //# sourceMappingURL=mailRecords.d.ts.map

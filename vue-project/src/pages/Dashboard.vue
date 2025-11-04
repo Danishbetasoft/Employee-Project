@@ -7,6 +7,7 @@
       @edit="editEmployee"
       @delete="handleDelete"
       @background="openProfessionalBackground"
+      @update-status="handleUpdateStatus"
     />
 
     <AddEdit
@@ -50,6 +51,7 @@ import useEmployee from '@/Composables/useEmployees'
 import { useSnackbar } from '@/Composables/snackbar'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
+import { apiemployee } from '@/plugins/employee'
 
 const {
   employeeStore,
@@ -60,7 +62,8 @@ const {
   selectedEmployee,
   saveEmployee,
   deleteEmployee: deleteEmployeeComposable,
-  saveBgInfo
+  saveBgInfo,
+  updateStatus,
 } = useEmployee()
 
 const { showSnackbar, snackbar } = useSnackbar()
@@ -79,25 +82,21 @@ function logout() {
 }
 
 function openAddModal() {
-  Object.assign(selectedEmployee, { id: null, username: '', email: '', bgInfo: {} })
+  Object.assign(selectedEmployee, { id: null, username: '', email: '', password: '', bgInfo: {} })
   isEditing.value = false
   modalVisible.value = true
 }
 
 function editEmployee(emp) {
-  Object.assign(selectedEmployee, emp) 
+  Object.assign(selectedEmployee, emp)
   isEditing.value = true
   modalVisible.value = true
 }
 
 function openProfessionalBackground(emp) {
-  Object.assign(selectedEmployee, {
-    ...emp,
-    bgInfo: emp.bgInfo || {}
-  })
+  Object.assign(selectedEmployee, { ...emp, bgInfo: emp.bgInfo || {} })
   bgModalVisible.value = true
 }
-
 
 function closeBgModal() {
   bgModalVisible.value = false
@@ -119,7 +118,7 @@ async function handleDelete(emp) {
 
 function closeAddEditModal() {
   modalVisible.value = false
-  Object.assign(selectedEmployee, { id: null, username: '', email: '', bgInfo: {} })
+  Object.assign(selectedEmployee, { id: null, username: '', email: '', password: '', bgInfo: {} })
 }
 
 function copyLink() {
@@ -131,16 +130,18 @@ function copyLink() {
 
 function handleOpenMailModal() {
   const link = `${window.location.origin}/edit/${selectedEmployee.id}`
-  
   mailFormData.to = selectedEmployee.email || ''
   mailFormData.message = `Hi,\n\nPlease review the employee background details using the link below:\n${link}\n\nBest regards,\nYour HR Team`
-  
   bgModalVisible.value = false
   mailModalVisible.value = true
 }
 
 function closeMailModal() {
   mailModalVisible.value = false
-  Object.assign(selectedEmployee, { id: null, username: '', email: '', bgInfo: {} }) 
+  Object.assign(selectedEmployee, { id: null, username: '', email: '', bgInfo: {} })
+}
+
+async function handleUpdateStatus({ employee, status }) {
+  await updateStatus(employee, status)
 }
 </script>

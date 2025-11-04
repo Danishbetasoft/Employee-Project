@@ -3,6 +3,8 @@ import { DataSource } from 'typeorm';
 import { Employee } from '../models/employee.js';
 import { MailEvent } from '../models/mailEvent.js';
 import { MailRecord } from '../models/mailRecords.js';
+import {User} from '../models/user.js';
+import {Role} from '../models/role.js';
 dotenv.config({ path: './backend/.env' });
 
 const AppDataSource = new DataSource({
@@ -14,7 +16,7 @@ const AppDataSource = new DataSource({
   database: process.env.DB_NAME,
   synchronize: true,
   logging: true,
-  entities: [Employee, MailRecord, MailEvent],
+  entities: [Employee, MailRecord, MailEvent,User,Role],
   migrations:
   ['./migrations']
 });

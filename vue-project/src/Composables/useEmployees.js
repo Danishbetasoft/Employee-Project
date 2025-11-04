@@ -101,6 +101,23 @@ export default function useEmployee(
   async function saveBgInfo(employeeData) {
     await employeeStore.store().update(employeeData.id, employeeData)
   }
+
+
+  async function updateStatus(employee, newStatus) {
+    try {
+      const res = await apiemployee.updateBackground(employee.id, {
+        bgInfo: employee.bgInfo,
+        status: newStatus
+      });
+        employeeStore.store().update(employee.id, res.data);
+
+      showSnackbar(`Employee status updated to ${newStatus}`, 'success');
+     
+    } catch (err) {
+      showSnackbar('Failed to update status', 'error');
+    }
+  }
+  
   
   const refName = computed(() => `dataGrid_${refKey.value}`)
   const dxGrid = computed(() => (dataGridRefName.value ? dataGridRefName.value.instance : null))
@@ -119,8 +136,9 @@ export default function useEmployee(
 
     dataGrid.refresh(changedOnly);
   };
-
+ 
   return {
+    updateStatus,
     employeeStore,
     modalVisible,
     bgModalVisible,

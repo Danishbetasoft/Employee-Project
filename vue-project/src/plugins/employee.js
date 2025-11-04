@@ -13,8 +13,8 @@ export const apiemployee = {
   remove(id) {
     return apiClient.delete(`/employees/${id}`)
   },
-  updateBackground(id, bgInfo) {
-    return apiClient.put(`/employees/${id}/bgInfo`, { bgInfo })
+  updateBackground(id, payload) {
+    return apiClient.put(`/employees/${id}/bgInfo`, payload)
   },
   sendMail(payload) {
     return apiClient.post('/mail/send', payload)

@@ -7,57 +7,55 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne } from 'typeorm';
-import { User } from './user.js';
-let Employee = class Employee {
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToOne, JoinColumn } from 'typeorm';
+import { Role } from './role.js';
+import { Employee } from './employee.js';
+let User = class User {
     id;
     username;
     email;
     password;
-    status;
     created_at;
     updated_at;
-    bgInfo;
-    user;
+    role;
+    employee;
 };
 __decorate([
     PrimaryGeneratedColumn(),
     __metadata("design:type", Object)
-], Employee.prototype, "id", void 0);
+], User.prototype, "id", void 0);
+__decorate([
+    Column({ type: 'varchar', length: 255, unique: true }),
+    __metadata("design:type", Object)
+], User.prototype, "username", void 0);
 __decorate([
     Column({ type: 'varchar', length: 255 }),
     __metadata("design:type", Object)
-], Employee.prototype, "username", void 0);
+], User.prototype, "email", void 0);
 __decorate([
     Column({ type: 'varchar', length: 255 }),
     __metadata("design:type", Object)
-], Employee.prototype, "email", void 0);
-__decorate([
-    Column({ type: 'varchar', length: 255 }),
-    __metadata("design:type", Object)
-], Employee.prototype, "password", void 0);
-__decorate([
-    Column({ type: 'varchar', length: 100 }),
-    __metadata("design:type", Object)
-], Employee.prototype, "status", void 0);
+], User.prototype, "password", void 0);
 __decorate([
     Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' }),
     __metadata("design:type", Object)
-], Employee.prototype, "created_at", void 0);
+], User.prototype, "created_at", void 0);
 __decorate([
     Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' }),
     __metadata("design:type", Object)
-], Employee.prototype, "updated_at", void 0);
+], User.prototype, "updated_at", void 0);
 __decorate([
-    Column({ type: 'json', nullable: true }),
+    ManyToOne(() => Role, (role) => role.users),
+    JoinColumn({ name: 'role_id' }),
     __metadata("design:type", Object)
-], Employee.prototype, "bgInfo", void 0);
+], User.prototype, "role", void 0);
 __decorate([
-    OneToOne(() => User, (user) => user.employee),
+    OneToOne(() => Employee, (employee) => employee.user, { cascade: true }),
+    JoinColumn({ name: 'employee_id' }),
     __metadata("design:type", Object)
-], Employee.prototype, "user", void 0);
-Employee = __decorate([
+], User.prototype, "employee", void 0);
+User = __decorate([
     Entity()
-], Employee);
-export { Employee };
-//# sourceMappingURL=employee.js.map
+], User);
+export { User };
+//# sourceMappingURL=user.js.map

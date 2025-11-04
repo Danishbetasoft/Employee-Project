@@ -1,15 +1,10 @@
-import express from 'express';
-
+import { Router } from 'express';
 import { Employee } from '../models/employee.js';
 import { AppDataSource } from '../DB/dataSource.cjs';
 
 const employeeRepository = AppDataSource.getRepository(Employee);
 
-
-const router = express.Router();
-
-
-
+const router = Router();
 
 router.put('/:id/bginfo',async(req, res) => {
   const { id } = req.params;

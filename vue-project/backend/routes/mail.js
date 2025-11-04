@@ -1,11 +1,10 @@
 
-import express from "express";
-import { sendMail } from "../controller/mailcontroller.js";
+import { Router } from 'express';
+import { MailService } from "../services/mailcontroller.js";
 
-const router = express.Router();
+const router = Router();
+const mailcontroller = new MailService()
 
-router.post("/send", sendMail);
+router.post("/send", (req, res) => mailcontroller.sendMail(req, res));
 
 export default router;
-
-

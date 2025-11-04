@@ -52,6 +52,22 @@
                 />
               </Field>
             </v-col>
+            <v-col cols="12">
+              <Field name="password" v-slot="{ field, errors }">
+                <v-text-field
+                  v-bind="field"
+                  label="Password"
+                  variant="outlined"
+                  prepend-inner-icon="mdi-lock-outline"
+                  color="primary"
+                  class="rounded-lg"
+                  type="password"
+                  :error="errors.length > 0"
+                  :error-messages="errors"
+                  v-model="employee.password"
+                />
+              </Field>
+            </v-col>
           </v-row>
 
           <div class="text-end mt-6">

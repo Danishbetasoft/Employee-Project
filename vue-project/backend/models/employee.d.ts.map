@@ -1,1 +1,1 @@
-{"version":3,"file":"employee.d.ts","sourceRoot":"","sources":["employee.ts"],"names":[],"mappings":"AAEA,qBACa,QAAQ;IAEnB,EAAE,EAAE,MAAM,CAAK;IAGf,QAAQ,EAAE,MAAM,CAAM;IAGtB,KAAK,EAAE,MAAM,CAAM;IAGnB,MAAM,EAAE,MAAM,CAAC,MAAM,EAAE,GAAG,CAAC,CAAM;CAClC"}
+{"version":3,"file":"employee.d.ts","sourceRoot":"","sources":["employee.ts"],"names":[],"mappings":"AAGA,qBACa,QAAQ;IAEnB,EAAE,MAAC;IAGH,QAAQ,MAAC;IAGT,KAAK,MAAC;IAGN,QAAQ,MAAC;IAGT,MAAM,MAAC;IAGP,UAAU,MAAC;IAGX,UAAU,MAAC;IAGX,MAAM,MAAC;IAGP,IAAI,MAAC;CACN"}

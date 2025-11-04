@@ -30,6 +30,8 @@ async function seedEmployees() {
     const employees = data.users.map((user) => ({
       username: user.username,
       email: user.email,
+      password: user.password,
+      status:'pending',
       bgInfo: {},
     }));
     await employeeRepository.save(employees);
